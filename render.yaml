@@ -1,0 +1,20 @@
+# Render Blueprint for the NEURAL COACH backend API.
+# Deploy: Render Dashboard → New → Blueprint → select Coach_Backend,
+# or `render blueprint launch` with a RENDER_API_KEY.
+services:
+  - type: web
+    name: coach-backend
+    runtime: node
+    plan: free
+    branch: main
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node apps/api/src/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
