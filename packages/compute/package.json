@@ -1,0 +1,17 @@
+{
+  "name": "@ai-coach/compute",
+  "version": "0.1.0",
+  "private": true,
+  "description": "C++ KD-Tree form engine + DP scheduler (Node-API) with pure-JS fallback",
+  "main": "js/index.js",
+  "gypfile": true,
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "build:clean": "node-gyp clean && node-gyp rebuild",
+    "bench": "node test/benchmark.cjs",
+    "test": "node test/unit.cjs"
+  },
+  "devDependencies": {
+    "node-gyp": "^11.0.0"
+  }
+}

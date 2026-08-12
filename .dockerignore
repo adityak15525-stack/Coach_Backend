@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+.git
+**/.git
+.mariadb
+dist
+**/dist
+*.log
+.env
+**/.env
+/tmp
+coverage
+.idea
+.vscode

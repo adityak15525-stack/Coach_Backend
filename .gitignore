@@ -1,0 +1,74 @@
+# ===== Environment & Secrets =====
+.env
+.env.*
+*.env
+.env.local
+.env.*.local
+# Keep example/template env files (no secrets) so deploys have a reference.
+!.env.example
+!infra/.env.example
+
+# Secret / credential files
+*.key
+*.pem
+*.crt
+*.cer
+*.pfx
+*.p12
+secrets.*
+credentials.*
+*.secret
+aws-credentials
+service-account*.json
+*-service-account.json
+
+# ===== Database (local dev data — never commit) =====
+.mariadb/
+*.db
+*.sqlite
+*.sqlite3
+*.ibd
+*.frm
+*.sql
+# Keep the schema (not data) so the backend can provision its tables.
+!infra/mysql/init/001_schema.sql
+
+# ===== Native build artifacts =====
+packages/compute/build/
+*.node
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.gypi
+*.target.mk
+
+# ===== Dependencies =====
+node_modules/
+.pnp
+.pnp.js
+
+# ===== Expo / React Native build output =====
+.expo/
+web-build/
+dist/
+build/
+.turbo/
+*.tgz
+
+# ===== Logs & OS =====
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# ===== Editor / IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== Local-only deploy overrides =====
+docker-compose.override.yml
+.render.yaml.local

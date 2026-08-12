@@ -1,0 +1,11 @@
+{
+  "name": "@ai-coach/dsa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Applied DSA toolkit: 8 algorithms wired to real lifting-coach features",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "demo": "node demo.js"
+  }
+}

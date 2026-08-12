@@ -1,0 +1,26 @@
+{
+  "name": "@ai-coach/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express backend: vision form engine, DP scheduler, DSA services, agent orchestrator",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "smoke": "node test/smoke.js",
+    "lint": "node --check src/index.js"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^1.0.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.6.2",
+    "jpeg-js": "^0.4.4",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.11.5",
+    "nodemailer": "^6.10.1",
+    "ws": "^8.18.0"
+  }
+}

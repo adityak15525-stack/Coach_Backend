@@ -1,0 +1,24 @@
+{
+  "name": "ai-coach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hyper-Adaptive Lifting & Form Coach — monorepo",
+  "workspaces": [
+    "apps/api",
+    "packages/compute",
+    "packages/dsa"
+  ],
+  "scripts": {
+    "build:compute": "npm run build --workspace @ai-coach/compute",
+    "test:compute": "npm run test --workspace @ai-coach/compute",
+    "bench:compute": "npm run bench --workspace @ai-coach/compute",
+    "test:dsa": "npm run test --workspace @ai-coach/dsa",
+    "demo:dsa": "npm run demo --workspace @ai-coach/dsa",
+    "smoke:api": "npm run smoke --workspace @ai-coach/api",
+    "start:api": "npm run start --workspace @ai-coach/api",
+    "start:all": "bash start.sh"
+  },
+  "dependencies": {
+    "firebase": "^12.17.1"
+  }
+}

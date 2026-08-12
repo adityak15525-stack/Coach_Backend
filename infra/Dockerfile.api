@@ -1,0 +1,20 @@
+# ---- Express API with monorepo workspaces (compute + dsa) ----
+FROM node:20-bookworm-slim AS api
+
+WORKDIR /repo
+
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY packages/compute/package.json packages/compute/package.json
+COPY packages/dsa/package.json packages/dsa/package.json
+RUN npm ci --no-audit --no-fund
+
+COPY packages/ packages/
+COPY apps/ apps/
+
+WORKDIR /repo/apps/api
+
+ENV NODE_ENV=production
+EXPOSE 4000
+
+CMD ["node", "src/index.js"]
