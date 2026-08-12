@@ -1,105 +1,57 @@
-# NEURAL COACH — Hyper-Adaptive Lifting & Form Coach
+# NEURAL COACH — Backend API
 
-A futuristic lifting coach: real-time **computer-vision form correction** (KD-Tree nearest-neighbor in C++),
-**dynamic-programming schedule optimization**, an **autonomous agent swarm** (nutrition → grocery → GenAI summary),
-a **voice assistant**, and a **3D holographic mobile UI**.
+Express backend for the Hyper-Adaptive Lifting & Form Coach: real-time **computer-vision
+form correction** (C++ KD-Tree nearest-neighbor), **dynamic-programming schedule
+optimization**, an **autonomous agent orchestrator**, a **voice assistant**, and a
+suite of **DSA services** (Trie, Fenwick Tree, Topological Sort, Priority Queue, …).
 
-```
-┌──────────────┐  frames/verdicts   ┌──────────────────┐  HTTP      ┌───────────────────┐
-│   Mobile     │ ◄───── WS ───────► │   Express API     │ ─────────► │  Python Agents    │
-│ (Expo + Skia │                    │  (DSA services)   │  agent     │ (FastAPI swarm)   │
-│  3D + voice) │                    │        │          │  swarm     │ nutrition/logistics│
-└──────────────┘                    └────────┼──────────┘            │ /summarizer       │
-                                             │ C++ Node-API         └───────────────────┘
-                                             ▼
-                                      KD-Tree + DP
-                                      (sub-50 µs)
-```
+> This repository contains **only the backend** (`apps/api` + `packages/*` + `infra`).
+> The mobile frontend is a separate repo: `Coach_Frontend_1`.
 
-## Ten DSA applications — all wired to features
-
-See [docs/DSA_MAP.md](docs/DSA_MAP.md). KD-Tree, DP knapsack, Trie, Fenwick Tree, Topological Sort,
-Sliding Window + EMA, LRU Cache, Priority Queue, Rabin-Karp, Monotonic Stack.
-
-## Architecture
+## What's inside
 
 | Path | What |
 |------|------|
-| `frontend/mobile` | React Native (Expo) — 3D Skia renderer, voice assistant, live session |
 | `apps/api` | Express — REST + WebSocket live-session, DSA services, agent orchestrator |
 | `packages/compute` | C++ KD-Tree + DP scheduler (Node-API) with JS fallback |
 | `packages/dsa` | 8 applied algorithms, tested + narrated demo |
-| `services/agents` | Python agent swarm (FastAPI) |
-| `infra` | docker-compose (MySQL + API + agents), SQL schema |
-| `docs/DSA_MAP.md` | algorithm → feature map with measured latency |
+| `infra` | SQL schema + docker-compose (MySQL / TiDB) |
 
 ## Quickstart
 
-### 1. Install + build the C++ engine
+### 1. Install (also builds the native C++ engine via `gypfile`)
 
 ```bash
-npm install                       # workspace install (compute, dsa, api)
-npm run build:compute             # native .node (falls back to JS automatically)
+npm install
 ```
 
-### 2. Run every verification
+### 2. Configure environment
 
 ```bash
-npm run test:compute      # C++/JS KD-Tree + DP unit tests
-npm run bench:compute     # sub-50µs latency proof
-npm run test:dsa          # 8 algorithms × unit tests
-npm run demo:dsa          # the 45-second-set walkthrough
-npm run smoke:api         # boots the API, hits 9 surfaces (no DB needed)
-python3 services/agents/smoke_test.py   # agent swarm smoke
+cp .env.example .env
+# edit .env and set at least:
+#   DATABASE_URL = mysql://user:pass@host:3306/db?ssl=true   (TiDB Serverless)
+#   JWT_SECRET   = any-long-random-string
 ```
 
-### 3. Run the whole app — one command
+### 3. Start the backend
 
 ```bash
-./start.sh        # or: npm run start:all
+npm start          # production: node apps/api/src/index.js   (:4000)
+npm run dev        # watch mode (node --watch)
 ```
 
-Starts (or reuses, if already running) the **Python agent swarm** (:8000),
-the **Express API** (:4000), and the **Expo dev server** (frontend/mobile, :8081),
-auto-wiring `EXPO_PUBLIC_API_URL`/`EXPO_PUBLIC_WS_URL` to your LAN IP.
+Health check: `GET /api/health`. Live WebSocket: `ws://localhost:4000/live-session`.
 
-- **Browser**: open `http://localhost:8081` (web build via react-native-web).
-- **Phone**: scan the QR with **Expo Go** (same Wi-Fi).
-- **Emulator**: press `a` in the Expo terminal.
-- `Ctrl+C` stops everything it started.
-- Logs: `/tmp/api.log`, `/tmp/agents.log`, `/tmp/expo.log`.
-
-Running pieces individually instead:
+## Verify
 
 ```bash
-# MySQL (optional for DSA endpoints; required for auth/logs)
-docker compose -f infra/docker-compose.yml up mysql
-
-# Python agent swarm
-cd services/agents/src && uvicorn main:app --port 8000
-
-# Express API
-npm run start:api                  # :4000  + ws /live-session
-
-# Frontend only
-cd frontend/mobile && npm install && npx expo start
+npm run smoke:api      # boots the API, hits surfaces (no DB needed)
+npm run test:compute   # C++/JS KD-Tree + DP unit tests
+npm run bench:compute  # sub-50µs latency proof
+npm run test:dsa       # 8 algorithms × unit tests
+npm run demo:dsa       # the walkthrough demo
 ```
-
-Point the app at your backend: set `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL`
-(use your LAN IP for a physical device).
-
-### Live form session
-
-The **Live Session** screen streams simulated pose frames over WebSocket.
-The API scores each frame against a KD-Tree of perfect-form templates (< 50 µs),
-flags deviations (knee valgus, rounded back), queues a voice cue, and the
-holo-athlete on screen mirrors the rep depth.
-
-### Voice assistant
-
-`expo-speech` TTS speaks the agent-generated scripts (works in Expo Go).
-Speech-to-text commands (e.g. "start squats") use `@react-native-voice/voice`
-and require a development build: `npx expo run:android`.
 
 ## API surface (all live without MySQL)
 
@@ -112,16 +64,16 @@ and require a development build: `npx expo run:android`.
 | `GET /analytics/pr-timeline` | Monotonic stack | all-time PRs |
 | `POST /sessions/build` | Topo sort | safe exercise order |
 | `POST /sessions/:id/complete` | — | fires the agent swarm |
-| `GET /coach/next-cue` | Priority queue | highest-criticality cue |
+| `POST /coach/next-cue` | Priority queue | highest-criticality cue |
 | `ws://:4000/live-session` | KD-Tree | streaming verdicts |
 
-## Notes
+## Environment variables
 
-- **Node 20 LTS** is recommended for Expo tooling (newer Node 22.x enables TS
-  type-stripping that breaks Expo SDK 57 config loading).
-- The app runs on **Android/iOS (Expo Go) and the web** (react-native-web).
-  Web shares the full UI — 3D Skia, animations, and voice *output* — but voice
-  *input* (`@react-native-voice/voice`) and device sensors need a native build.
-- MySQL schema lives in `infra/mysql/init/001_schema.sql` and includes vector
-  support hooks for `agent_memory.embedding`.
-- The C++ module auto-falls back to a pure-JS twin so the stack runs anywhere.
+| Var | Required | Notes |
+|-----|----------|-------|
+| `DATABASE_URL` | yes | Full mysql2 URL; `?ssl=true` enables TLS (TiDB Serverless) |
+| `JWT_SECRET` | yes | Throws on boot if missing |
+| `PORT` | no | default 4000 |
+| `OPENAI_API_KEY` / `GEMINI_API_KEY` | no | LLM features |
+| `AGENTS_URL` | no | default `http://localhost:8000` |
+| `SMTP_*` | no | empty → welcome emails logged (dev mode) |

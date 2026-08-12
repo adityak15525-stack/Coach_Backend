@@ -15,8 +15,8 @@
     "test:dsa": "npm run test --workspace @ai-coach/dsa",
     "demo:dsa": "npm run demo --workspace @ai-coach/dsa",
     "smoke:api": "npm run smoke --workspace @ai-coach/api",
-    "start:api": "npm run start --workspace @ai-coach/api",
-    "start:all": "bash start.sh"
+    "start": "npm run start --workspace @ai-coach/api",
+    "dev": "node --watch apps/api/src/index.js"
   },
   "dependencies": {
     "firebase": "^12.17.1"
