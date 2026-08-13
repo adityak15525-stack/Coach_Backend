@@ -9,8 +9,17 @@ const { notFound, errorHandler } = require('./middlewares/errors');
 const { attachLiveSession } = require('./socket/liveSession');
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:4000',
+  'http://127.0.0.1:3000',
+  'http://localhost:8081',
+  'http://127.0.0.1:8081',
+  'https://your-deployed-frontend-url.com',
+];
+const extraOrigins = (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:4000', 'http://127.0.0.1:3000', 'https://your-deployed-frontend-url.com'],
+  origin: [...allowedOrigins, ...extraOrigins],
   credentials: true,
   optionsSuccessStatus: 200,
 };
