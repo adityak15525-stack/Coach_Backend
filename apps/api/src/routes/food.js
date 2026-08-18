@@ -73,6 +73,7 @@ router.post('/food/analyze-image', async (req, res) => {
   if (!image) return res.status(400).json({ error: 'image (base64) is required' });
 
   const vision = require('../services/visionAnalyzer');
+const { clampGrams } = vision;
   try {
     const guess = await vision.identifyFood(image, mimeType);
     if (!guess.name) {

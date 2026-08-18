@@ -15,6 +15,7 @@
     "test:dsa": "npm run test --workspace @ai-coach/dsa",
     "demo:dsa": "npm run demo --workspace @ai-coach/dsa",
     "smoke:api": "npm run smoke --workspace @ai-coach/api",
+    "demo:api": "npm run demo --workspace @ai-coach/api",
     "start": "npm run start --workspace @ai-coach/api",
     "dev": "node --watch apps/api/src/index.js"
   },

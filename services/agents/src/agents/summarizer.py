@@ -1,10 +1,13 @@
 import os
 from typing import Any
 
+import httpx
+
 from agents.base import Agent
 
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 
 class SummarizerAgent(Agent):
@@ -59,11 +62,44 @@ class SummarizerAgent(Agent):
         )
 
     def _genai_script(self, name, form_line, nutrition_line, cart_line) -> str:
-        # Deterministic wrapper around a real LLM call goes here
-        # (OpenAI chat completions / Gemini generateContent).
         prompt = (
             f"Write a 40-word energetic workout summary for {name}. Facts: {form_line} "
             f"{nutrition_line} {cart_line}. Localized, punchy, no clichés."
         )
-        # return call_llm(prompt)  # wired when keys are configured
+        try:
+            if OPENAI_KEY:
+                return self._call_openai(prompt)
+            if GEMINI_KEY:
+                return self._call_gemini(prompt)
+        except Exception as exc:
+            self.log(f"LLM call failed ({exc}), falling back to template")
         return self._fallback_script(name, form_line, nutrition_line, cart_line)
+
+    def _call_openai(self, prompt: str) -> str:
+        resp = httpx.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {OPENAI_KEY}"},
+            json={
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 120,
+                "temperature": 0.7,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip()
+
+    def _call_gemini(self, prompt: str) -> str:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_KEY}"
+        resp = httpx.post(
+            url,
+            json={
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.7, "maxOutputTokens": 120},
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()

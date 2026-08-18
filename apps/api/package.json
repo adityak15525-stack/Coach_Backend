@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "smoke": "node test/smoke.js",
+    "demo": "node test/demo.js",
     "lint": "node --check src/index.js"
   },
   "dependencies": {

@@ -113,4 +113,4 @@ function clampConfidence(c) {
   return Math.min(1, Math.max(0, n));
 }
 
-module.exports = { identifyFood, MODEL };
+module.exports = { identifyFood, clampGrams, MODEL };
